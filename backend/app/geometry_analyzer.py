@@ -87,10 +87,8 @@ class GeometryAnalyzer:
                 doc = FreeCAD.newDocument("Analysis")
 
                 try:
-                    # Import IGES file using ImportIges
-                    import ImportIges
-
-                    ImportIges.open(file_path, doc.Name)
+                    # Import IGES file using Part module directly
+                    Part.read(file_path, doc.Name)
 
                     # Get the shape from the imported object
                     shape = doc.Objects[0].Shape
@@ -100,9 +98,9 @@ class GeometryAnalyzer:
                     surface_area = shape.Area
                     center_mass = shape.CenterOfMass
 
-                except ImportError:
+                except Exception as e:
                     return {
-                        "error": "IGES import module not available. Please install FreeCAD with IGES support.",
+                        "error": f"Failed to import IGES file: {str(e)}",
                         "units": "mm",
                     }
                 finally:

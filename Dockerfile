@@ -22,7 +22,6 @@ RUN apt-get update && \
     python3-pyside2.qtcore \
     python3-pyside2.qtgui \
     python3-numpy \
-    python3-iges \
     bash \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
