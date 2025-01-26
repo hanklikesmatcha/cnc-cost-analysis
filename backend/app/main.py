@@ -17,8 +17,8 @@ converter = CADConverter()
 ENVIRONMENT = os.getenv("FLASK_ENV", "development")
 CORS_ORIGINS = [
     "http://localhost:5173",  # Vite dev server
-    "http://localhost:8000",  # Production server
-    os.getenv("FRONTEND_URL", ""),  # Production URL from env
+    "http://localhost:8000",  # Local production server
+    "https://*.railway.app",  # Railway default domain
 ]
 
 app.add_middleware(

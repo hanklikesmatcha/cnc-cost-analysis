@@ -1,6 +1,7 @@
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /frontend
+# Copy frontend files from parent directory
 COPY ../frontend/package*.json ./
 RUN npm install
 COPY ../frontend .
@@ -9,6 +10,8 @@ RUN npm run build
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
 
 # Install Python, FreeCAD and other dependencies with optimized layer
 RUN apt-get update && \
@@ -35,16 +38,12 @@ COPY app app/
 RUN mkdir -p uploads converted static && \
     chmod 777 uploads converted static
 
-# Copy frontend build
+# Copy frontend build from the builder stage
 COPY --from=frontend-builder /frontend/dist /app/static
 
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
 ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
-
-# Production specific settings
-ENV FLASK_ENV=production
-ENV FLASK_DEBUG=0
 
 EXPOSE 8000
 
