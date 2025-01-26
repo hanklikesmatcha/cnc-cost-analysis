@@ -1,5 +1,6 @@
 import { useLanguage } from "../contexts/languageUtils";
 import { translations } from "../translations";
+import { formatNumber } from "../utils/unitConversion";
 
 type MaterialKey = keyof typeof translations.en.materials;
 
@@ -98,7 +99,7 @@ interface CostAnalysisProps {
 export function CostAnalysis({ volume, processingTime }: CostAnalysisProps) {
   const { t } = useLanguage();
 
-  // Convert volume from mm³ to cm³
+  // Convert volume from mm³ to cm³ for calculations
   const volumeInCm3 = volume / 1000;
 
   // Machine cost per hour (NT$ 1500 per hour for competitive Taiwanese manufacturing)
@@ -127,8 +128,10 @@ export function CostAnalysis({ volume, processingTime }: CostAnalysisProps) {
                     <div className="cost-value">
                       {t.materials[material.translationKey] || material.name}
                     </div>
-                    <div className="cost-value">{weight.toFixed(2)}g</div>
-                    <div className="cost-value">${materialCost.toFixed(2)}</div>
+                    <div className="cost-value">{formatNumber(weight)}g</div>
+                    <div className="cost-value">
+                      ${formatNumber(materialCost)}
+                    </div>
                   </div>
                 );
               })}
@@ -143,13 +146,13 @@ export function CostAnalysis({ volume, processingTime }: CostAnalysisProps) {
               <div className="cost-item">
                 <span className="cost-label">{t.cost.machineTime}:</span>
                 <span className="cost-value">
-                  {processingTime} {t.analysis.minutes}
+                  {formatNumber(processingTime)} {t.analysis.minutes}
                 </span>
               </div>
               <div className="cost-item">
                 <span className="cost-label">{t.cost.machineCost}:</span>
                 <span className="cost-value">
-                  ${((processingTime / 60) * machineRate).toFixed(2)}
+                  ${formatNumber((processingTime / 60) * machineRate)}
                 </span>
               </div>
             </div>

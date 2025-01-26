@@ -56,6 +56,7 @@ export const translations = {
     },
     status: {
       title: "Status",
+      refresh: "Refresh",
       completed: "Completed",
       failed: "Failed",
       processing: "Processing",
@@ -74,6 +75,18 @@ export const translations = {
       steel1045: "Steel 1045",
       stainless304: "Stainless 304",
       stainless316: "Stainless 316",
+    },
+    units: {
+      metric: "Metric",
+      imperial: "Imperial",
+    },
+    tooltips: {
+      volume: "The total volume of the part in cubic millimeters/inches",
+      surfaceArea:
+        "The total surface area of the part in square millimeters/inches",
+      centerOfMass: "The geometric center of the part's mass",
+      processingTime:
+        "Estimated machining time based on part complexity and size",
     },
   },
   "zh-TW": {
@@ -131,6 +144,7 @@ export const translations = {
     },
     status: {
       title: "狀態",
+      refresh: "重新整理",
       completed: "完成",
       failed: "失敗",
       processing: "處理中",
@@ -149,6 +163,16 @@ export const translations = {
       steel1045: "1045 碳鋼",
       stainless304: "304 不鏽鋼",
       stainless316: "316 不鏽鋼",
+    },
+    units: {
+      metric: "公制",
+      imperial: "英制",
+    },
+    tooltips: {
+      volume: "零件的總體積（立方毫米/英寸）",
+      surfaceArea: "零件的總表面積（平方毫米/英寸）",
+      centerOfMass: "零件質量的幾何中心",
+      processingTime: "基於零件複雜度和尺寸的估計加工時間",
     },
   },
   "zh-CN": {
@@ -206,6 +230,7 @@ export const translations = {
     },
     status: {
       title: "状态",
+      refresh: "刷新",
       completed: "完成",
       failed: "失败",
       processing: "处理中",
@@ -224,6 +249,16 @@ export const translations = {
       steel1045: "1045 碳钢",
       stainless304: "304 不锈钢",
       stainless316: "316 不锈钢",
+    },
+    units: {
+      metric: "公制",
+      imperial: "英制",
+    },
+    tooltips: {
+      volume: "零件的总体积（立方毫米/英寸）",
+      surfaceArea: "零件的总表面积（平方毫米/英寸）",
+      centerOfMass: "零件质量的几何中心",
+      processingTime: "基于零件复杂度和尺寸的估计加工时间",
     },
   },
 } as const;

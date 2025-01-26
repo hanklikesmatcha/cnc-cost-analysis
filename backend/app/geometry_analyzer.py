@@ -10,41 +10,68 @@ class GeometryAnalyzer:
     """Analyze geometry of CAD files"""
 
     def estimate_processing_time(self, volume: float, surface_area: float) -> float:
-        """Estimate processing time in minutes based on geometry"""
-        # Calculation for Taiwanese manufacturing with 15 CNC machines:
-        # - More efficient with parallel processing capabilities
-        # - Higher throughput due to multiple machines
-        # - Experienced operators and optimized workflows
+        """
+        Estimate processing time in minutes based on geometry and complexity
 
-        # Volume processing (more efficient with modern CNC machines)
-        volume_time = volume / 8000  # Faster material removal rate
+        Factors considered:
+        - Volume removal rate (varies with material hardness)
+        - Surface complexity (ratio of surface area to volume^(2/3))
+        - Setup time (base time for machine setup)
+        - Finishing time (based on surface area)
+        """
+        # Calculate shape complexity factor
+        # Using surface area to volume ratio compared to a perfect sphere
+        # Higher ratio means more complex shape
+        theoretical_min_surface_area = 4.836 * pow(
+            volume, 2 / 3
+        )  # Surface area of a sphere with same volume
+        complexity_factor = min(3.0, surface_area / theoretical_min_surface_area)
 
-        # Surface finishing (skilled operators, better equipment)
-        surface_time = surface_area / 800  # More efficient surface processing
+        # Base setup time (minutes)
+        base_time = 5.0
 
-        # Base setup time (reduced due to experience and automation)
-        base_time = 3  # minutes for setup
+        # Volume processing time
+        # Assuming average material hardness
+        # 6000 mm³/min is a typical material removal rate for medium hardness materials
+        volume_time = (volume / 6000) * complexity_factor
 
-        # Return with 2 decimal places
-        return round(base_time + volume_time + surface_time, 2)
+        # Surface finishing time
+        # Assuming 500 mm²/min for standard finish
+        # Adjusted by complexity factor
+        surface_time = (surface_area / 500) * complexity_factor
+
+        # Add contingency for tool changes and precision adjustments
+        contingency_time = (volume_time + surface_time) * 0.15
+
+        total_time = base_time + volume_time + surface_time + contingency_time
+
+        # Round to 2 decimal places
+        return round(total_time, 2)
 
     def calculate_cost_usd(self, processing_time: float) -> float:
-        """Calculate cost in USD based on processing time"""
-        # Cost calculation for a facility with 15 CNC machines
-        # Operating costs include:
-        # - Machine depreciation
-        # - Electricity
-        # - Labor (skilled operators)
-        # - Overhead (facility, maintenance, etc.)
+        """
+        Calculate cost in USD based on processing time and complexity
 
+        Factors considered:
+        - Machine operation cost
+        - Labor cost
+        - Material handling
+        - Setup and teardown
+        """
         # Base rate in NT$ per hour for CNC operation
         hourly_rate_nt = 1500  # Competitive rate for Taiwanese market
 
-        # Convert minutes to hours and calculate cost in NT$
-        cost_nt = (processing_time / 60) * hourly_rate_nt
+        # Add setup cost
+        setup_cost_nt = 500
+
+        # Calculate operation cost
+        operation_cost_nt = (processing_time / 60) * hourly_rate_nt
+
+        # Total cost in NT$
+        total_cost_nt = setup_cost_nt + operation_cost_nt
 
         # Convert to USD (approximate rate: 1 USD = 31.5 NT$)
-        cost_usd = cost_nt / 31.5
+        cost_usd = total_cost_nt / 31.5
 
         # Return with 2 decimal places
         return round(cost_usd, 2)
