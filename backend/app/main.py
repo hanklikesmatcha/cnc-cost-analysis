@@ -3,15 +3,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
+import logging
 from pathlib import Path
 from .geometry_analyzer import GeometryAnalyzer
 from .cad_converter import CADConverter
 from typing import Dict, Any
 import time
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 geometry_analyzer = GeometryAnalyzer()
 converter = CADConverter()
+
+# Log startup configuration
+logger.info(f"Starting app with ENVIRONMENT: {os.getenv('FLASK_ENV', 'development')}")
+logger.info(f"PORT: {os.getenv('PORT', '8000')}")
+logger.info(f"Current working directory: {os.getcwd()}")
 
 # Configure CORS based on environment
 ENVIRONMENT = os.getenv("FLASK_ENV", "development")
@@ -30,15 +40,32 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Application startup")
+    logger.info(f"Static files will be served: {ENVIRONMENT == 'production'}")
+    logger.info(f"Current directory contents: {os.listdir('.')}")
+
+
 @app.get("/")
 async def root():
+    logger.debug("Root endpoint called")
     return {"status": "ok", "message": "CNC API is running"}
 
 
 @app.get("/health")
 @app.get("/api/health")
 async def health_check():
-    return {"status": "healthy", "service": "backend"}
+    logger.debug("Health check endpoint called")
+    try:
+        # Check if we can access required directories
+        logger.info(
+            f"Checking directories - uploads: {os.path.exists('uploads')}, converted: {os.path.exists('converted')}, static: {os.path.exists('static')}"
+        )
+        return {"status": "healthy", "service": "backend"}
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        return {"status": "unhealthy", "error": str(e)}
 
 
 # Mount static files only in production
