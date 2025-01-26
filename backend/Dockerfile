@@ -1,10 +1,10 @@
 FROM node:18-alpine AS frontend-builder
 
 WORKDIR /frontend
-# Copy frontend files from parent directory
-COPY ../frontend/package*.json ./
+# Copy frontend files
+COPY frontend/package*.json ./
 RUN npm install
-COPY ../frontend .
+COPY frontend .
 RUN npm run build
 
 FROM ubuntu:22.04
@@ -28,11 +28,11 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy requirements first
-COPY ./requirements.txt .
+COPY backend/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy only the application code
-COPY ./app app/
+COPY backend/app app/
 
 # Create and set permissions for required directories
 RUN mkdir -p uploads converted static && \
