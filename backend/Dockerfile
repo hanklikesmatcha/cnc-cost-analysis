@@ -2,8 +2,9 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /frontend
 # Copy frontend files from parent directory
-COPY ../frontend ./
+COPY ../frontend/package*.json ./
 RUN npm install
+COPY ../frontend .
 RUN npm run build
 
 FROM ubuntu:22.04
@@ -26,12 +27,12 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Copy and install Python dependencies first
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt uvicorn
+# Copy requirements first
+COPY ./requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy backend files
-COPY . .
+# Copy only the application code
+COPY ./app app/
 
 # Create and set permissions for required directories
 RUN mkdir -p uploads converted static && \
@@ -46,5 +47,5 @@ ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 
 EXPOSE 8000
 
-# Default command with single worker and debug logging
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --log-level debug 
+# Default command (can be overridden by Railway)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
