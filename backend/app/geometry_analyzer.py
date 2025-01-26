@@ -64,11 +64,11 @@ class GeometryAnalyzer:
                 surface_area = np.sum(mesh_data.areas)  # Total surface area
                 center_mass = mesh_data.get_mass_properties()[1]  # Center of mass
 
-            elif file_ext in [".step", ".stp", ".iges", ".igs"]:
+            elif file_ext in [".step", ".stp"]:
                 # Create a new document
                 doc = FreeCAD.newDocument("Analysis")
 
-                # Import the file
+                # Import STEP file
                 Part.insert(file_path, doc.Name)
 
                 # Get the shape from the imported object
@@ -81,6 +81,33 @@ class GeometryAnalyzer:
 
                 # Clean up
                 FreeCAD.closeDocument(doc.Name)
+
+            elif file_ext in [".iges", ".igs"]:
+                # Create a new document
+                doc = FreeCAD.newDocument("Analysis")
+
+                try:
+                    # Import IGES file using ImportIges
+                    import ImportIges
+
+                    ImportIges.open(file_path, doc.Name)
+
+                    # Get the shape from the imported object
+                    shape = doc.Objects[0].Shape
+
+                    # Calculate properties
+                    volume = shape.Volume
+                    surface_area = shape.Area
+                    center_mass = shape.CenterOfMass
+
+                except ImportError:
+                    return {
+                        "error": "IGES import module not available. Please install FreeCAD with IGES support.",
+                        "units": "mm",
+                    }
+                finally:
+                    # Clean up
+                    FreeCAD.closeDocument(doc.Name)
 
             else:
                 return {
