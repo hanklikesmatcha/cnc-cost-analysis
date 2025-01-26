@@ -1,4 +1,5 @@
 import { useLanguage } from "../contexts/languageUtils";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 interface ConversionStatusProps {
   status: string;
@@ -11,13 +12,13 @@ export function ConversionStatus({ status, error }: ConversionStatusProps) {
   const getStatusColor = () => {
     switch (status) {
       case "completed":
-        return "text-green-600";
+        return "success";
       case "failed":
-        return "text-red-600";
+        return "danger";
       case "processing":
-        return "text-blue-600";
+        return "info";
       default:
-        return "text-gray-600";
+        return "secondary";
     }
   };
 
@@ -35,22 +36,22 @@ export function ConversionStatus({ status, error }: ConversionStatusProps) {
   };
 
   return (
-    <div className="w-full flex justify-center">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-        <div className="flex flex-col items-center space-y-2">
-          <div className="text-gray-700 font-medium">{t.status.title}</div>
-          <div className={`font-bold ${getStatusColor()}`}>
-            {getStatusText()}
-          </div>
-        </div>
-        {error && (
-          <div className="mt-4 p-3 bg-red-50 rounded border border-red-200">
-            <div className="font-medium text-red-600 mb-1">
-              {t.status.error}
-            </div>
-            <div className="text-red-600">{error}</div>
-          </div>
-        )}
+    <div
+      className="toast show mx-auto"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div className="toast-header">
+        <div
+          className={`rounded-circle me-2 bg-${getStatusColor()}`}
+          style={{ width: "20px", height: "20px" }}
+        ></div>
+        <strong className="me-auto">{t.status.title}</strong>
+      </div>
+      <div className={`toast-body text-${getStatusColor()}`}>
+        {getStatusText()}
+        {error && <div className="mt-2 small text-danger">{error}</div>}
       </div>
     </div>
   );

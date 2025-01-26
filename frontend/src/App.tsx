@@ -5,6 +5,7 @@ import { GeometryAnalysis } from "./components/GeometryAnalysis";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/languageUtils";
 import { LanguageSwitch } from "./components/LanguageSwitch";
+import { UploadStatus } from "./components/UploadStatus";
 import "./App.css";
 
 // Get API URL from environment variables, fallback to window.location.origin
@@ -112,35 +113,26 @@ function MainContent() {
       </div>
 
       {/* Upload Section - Reduced spacing */}
-      <section className="upload-section py-6">
+      <section className="upload-section mt-4">
         <div className="card">
           <div className="card-content p-4">
             <h2 className="text-xl mb-2 text-center">{t.uploadTitle}</h2>
             <p className="text-center text-sm mb-4">{t.uploadDescription}</p>
 
             <div className="w-full flex justify-center mb-4">
-              {status === "completed" || status === "failed" ? (
-                <div className="flex flex-col items-center gap-4">
-                  <button
-                    onClick={handleReset}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                  >
-                    Upload Another File
-                  </button>
-                  {status === "completed" && (
-                    <div className="text-green-600">
-                      Analysis completed successfully!
-                    </div>
-                  )}
-                </div>
-              ) : (
+              {!(status === "completed" || status === "failed") && (
                 <FileUploader onUploadSuccess={setJobId} />
               )}
             </div>
 
             {jobId && (
-              <div className="w-full border-t pt-4 flex flex-col items-center">
-                <ConversionStatus status={status} error={error} />
+              <div className="w-full border-t pt-4 flex flex-col items-center text-center">
+                <div className="w-full max-w-md text-center">
+                  <ConversionStatus status={status} error={error} />
+                  {(status === "completed" || status === "failed") && (
+                    <UploadStatus status={status} onReset={handleReset} />
+                  )}
+                </div>
               </div>
             )}
 
@@ -162,7 +154,7 @@ function MainContent() {
       </section>
 
       {/* Company Info Section */}
-      <section className="bg-gray-50 py-8 mt-8">
+      <section className="bg-gray-50 py-4 mt-4">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">{t.companyInfo.name}</h2>

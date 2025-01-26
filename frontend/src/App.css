@@ -116,7 +116,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 3rem;
 }
 
 .card h2 {
@@ -142,7 +142,7 @@
 /* Features Section */
 .features-section {
   width: 100%;
-  padding: 6rem 1rem;
+  padding: 2rem 1rem;
   background-color: #e0f2fe;
   display: flex;
   justify-content: center;
@@ -154,7 +154,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3rem;
+  gap: 2rem;
 }
 
 .features-section h2 {
@@ -312,10 +312,6 @@
   border-radius: 8px;
   background: #e8f5e9;
   color: #2e7d32;
-}
-
-.uploaded-files {
-  margin-top: 2rem;
 }
 
 .uploaded-files ul {
@@ -494,6 +490,7 @@
   border: 1px solid #bae6fd;
   border-radius: 1rem;
   padding: 1.5rem;
+  margin-top: 2rem;
 }
 
 .cost-title {

@@ -11,6 +11,7 @@ export const translations = {
     subtitle: "Professional CNC Machining & Rapid Prototyping",
     uploadTitle: "Get Instant Quote",
     uploadDescription: "Upload your CAD file for instant cost analysis",
+    uploadNew: "Upload New File",
     dropzone: {
       active: "📂 Drop the CAD file here...",
       inactive: "📂 Drag and drop a CAD file here, or click to select a file",
@@ -86,6 +87,7 @@ export const translations = {
     subtitle: "專業 CNC 加工及快速原型製作",
     uploadTitle: "即時報價",
     uploadDescription: "上傳 CAD 檔案獲得即時成本分析",
+    uploadNew: "上傳新檔案",
     dropzone: {
       active: "📂 將 CAD 檔案拖放至此...",
       inactive: "📂 將 CAD 檔案拖放至此，或點擊選擇檔案",
@@ -160,6 +162,7 @@ export const translations = {
     subtitle: "专业 CNC 加工及快速原型制作",
     uploadTitle: "即时报价",
     uploadDescription: "上传 CAD 文件获得即时成本分析",
+    uploadNew: "上传新文件",
     dropzone: {
       active: "📂 将 CAD 文件拖放至此...",
       inactive: "📂 将 CAD 文件拖放至此，或点击选择文件",
