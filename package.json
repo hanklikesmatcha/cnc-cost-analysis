@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@types/axios": "^0.14.4",
+    "@types/react-dropzone": "^5.1.0",
+    "axios": "^1.7.9",
+    "react-dropzone": "^14.3.5"
+  }
+}

@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cad-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
+      - LD_LIBRARY_PATH=/usr/lib/freecad/lib
+    networks:
+      - cad-network
+
+  frontend:
+    build: ./frontend
+    container_name: cad-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - cad-network
+
+networks:
+  cad-network:
+    driver: bridge
