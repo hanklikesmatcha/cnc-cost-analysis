@@ -47,5 +47,5 @@ ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 
 EXPOSE 8000
 
-# Use a shell form to allow environment variable expansion
-CMD python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
+# Default command (can be overridden by Railway)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
