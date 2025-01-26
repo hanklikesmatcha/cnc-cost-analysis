@@ -91,7 +91,6 @@ async def root():
 
 
 @app.get("/health")
-@app.get("/api/health")
 async def health_check():
     try:
         logger.debug("Health check called")
@@ -119,6 +118,11 @@ async def health_check():
                 "traceback": traceback.format_exc(),
             },
         )
+
+
+@app.get("/api/health")
+async def api_health_check():
+    return await health_check()
 
 
 # Create directories if they don't exist
