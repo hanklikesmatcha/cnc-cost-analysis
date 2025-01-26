@@ -190,4 +190,15 @@ async def check_conversion_status(job_id: str):
 
 # Mount static files at the end in production
 if ENVIRONMENT == "production":
+    # Serve static files and assets
+    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+    @app.exception_handler(404)
+    async def not_found_handler(request, exc):
+        if not request.url.path.startswith("/api"):
+            return FileResponse("static/index.html")
+        return JSONResponse(
+            status_code=404,
+            content={"detail": "Not Found"},
+        )

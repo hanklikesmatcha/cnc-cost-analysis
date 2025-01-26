@@ -36,11 +36,11 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY backend/app app/
 
 # Create and set permissions for required directories
-RUN mkdir -p uploads converted static && \
-    chmod 777 uploads converted static
+RUN mkdir -p uploads converted static/assets && \
+    chmod -R 777 uploads converted static
 
 # Copy frontend build from the builder stage
-COPY --from=frontend-builder /frontend/dist/* /app/static/
+COPY --from=frontend-builder /frontend/dist/ /app/static/
 
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
@@ -49,4 +49,4 @@ ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 EXPOSE 8000
 
 # Default command (can be overridden by Railway)
-CMD ["bash", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4}"] 
+CMD ["bash", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"] 
