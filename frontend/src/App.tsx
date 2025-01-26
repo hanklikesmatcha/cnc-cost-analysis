@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FileUploader } from "./components/FileUploader";
 import { ConversionStatus } from "./components/ConversionStatus";
 import { GeometryAnalysis } from "./components/GeometryAnalysis";

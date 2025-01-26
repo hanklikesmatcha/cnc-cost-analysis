@@ -1,4 +1,3 @@
-import React from "react";
 import { useLanguage } from "../contexts/languageUtils";
 import { translations } from "../translations";
 
