@@ -1,20 +1,41 @@
+# Python
 __pycache__
 *.pyc
 *.pyo
 *.pyd
 .Python
-env
+env/
+venv/
+.env
+.env.local
+.env.*.local
+
+# Development
+.git
+.gitignore
+Dockerfile*
+docker-compose*
+README.md
+*.md
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Keep these files
+!requirements.txt
+!app/
+!converted/
+!uploads/
+
 pip-log.txt
 pip-delete-this-directory.txt
 .tox
-.coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
 *.log
-.pytest_cache
 .env.local
-.env.*.local
 .DS_Store 

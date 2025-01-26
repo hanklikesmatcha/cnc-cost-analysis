@@ -2,24 +2,28 @@ FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Python, FreeCAD and other dependencies
-RUN apt-get update && apt-get install -y \
+# Install Python, FreeCAD and other dependencies with optimized layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     freecad \
     python3-pyside2.qtcore \
     python3-pyside2.qtgui \
     python3-numpy \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy only requirements first to leverage Docker cache
-COPY requirements.txt ./
+# Copy requirements first
+COPY ./requirements.txt /app/requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY ./app /app/app
+COPY ./converted /app/converted
+COPY ./uploads /app/uploads
 
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
@@ -35,4 +39,5 @@ RUN mkdir -p /app/uploads /app/converted && \
 
 EXPOSE 8000
 
-CMD ["python3", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"] 
+# Use a shell form to allow environment variable expansion
+CMD python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
