@@ -3,25 +3,41 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import os
+import sys
 import logging
 from pathlib import Path
-from .geometry_analyzer import GeometryAnalyzer
-from .cad_converter import CADConverter
+import traceback
 from typing import Dict, Any
 import time
 
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
+# Configure logging to stdout
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stdout,
+)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
-geometry_analyzer = GeometryAnalyzer()
-converter = CADConverter()
+# Create FastAPI app with debug mode
+app = FastAPI(debug=True)
 
-# Log startup configuration
-logger.info(f"Starting app with ENVIRONMENT: {os.getenv('FLASK_ENV', 'development')}")
-logger.info(f"PORT: {os.getenv('PORT', '8000')}")
+# Log system information
+logger.info(f"Python version: {sys.version}")
 logger.info(f"Current working directory: {os.getcwd()}")
+logger.info(f"Directory contents: {os.listdir('.')}")
+logger.info(f"Environment variables: {dict(os.environ)}")
+
+try:
+    from .geometry_analyzer import GeometryAnalyzer
+    from .cad_converter import CADConverter
+
+    geometry_analyzer = GeometryAnalyzer()
+    converter = CADConverter()
+    logger.info("Successfully initialized GeometryAnalyzer and CADConverter")
+except Exception as e:
+    logger.error(f"Failed to initialize analyzers: {str(e)}")
+    logger.error(traceback.format_exc())
+    raise
 
 # Configure CORS based on environment
 ENVIRONMENT = os.getenv("FLASK_ENV", "development")
@@ -42,9 +58,26 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Application startup")
-    logger.info(f"Static files will be served: {ENVIRONMENT == 'production'}")
-    logger.info(f"Current directory contents: {os.listdir('.')}")
+    try:
+        logger.info("Starting application initialization")
+
+        # Create required directories
+        for dir_name in ["uploads", "converted", "static"]:
+            path = Path(dir_name)
+            path.mkdir(exist_ok=True)
+            logger.info(
+                f"Directory {dir_name} exists: {path.exists()}, is writable: {os.access(path, os.W_OK)}"
+            )
+
+        # Check Python path
+        logger.info(f"PYTHONPATH: {os.getenv('PYTHONPATH')}")
+        logger.info(f"sys.path: {sys.path}")
+
+        logger.info("Application initialization completed successfully")
+    except Exception as e:
+        logger.error(f"Startup failed: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
 
 
 @app.get("/")
@@ -56,16 +89,32 @@ async def root():
 @app.get("/health")
 @app.get("/api/health")
 async def health_check():
-    logger.debug("Health check endpoint called")
     try:
-        # Check if we can access required directories
-        logger.info(
-            f"Checking directories - uploads: {os.path.exists('uploads')}, converted: {os.path.exists('converted')}, static: {os.path.exists('static')}"
-        )
-        return {"status": "healthy", "service": "backend"}
+        logger.debug("Health check called")
+        status = {
+            "status": "healthy",
+            "service": "backend",
+            "environment": ENVIRONMENT,
+            "cwd": os.getcwd(),
+            "directories": {
+                "uploads": os.path.exists("uploads"),
+                "converted": os.path.exists("converted"),
+                "static": os.path.exists("static"),
+            },
+        }
+        logger.info(f"Health check response: {status}")
+        return status
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
-        return {"status": "unhealthy", "error": str(e)}
+        logger.error(traceback.format_exc())
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "unhealthy",
+                "error": str(e),
+                "traceback": traceback.format_exc(),
+            },
+        )
 
 
 # Mount static files only in production
