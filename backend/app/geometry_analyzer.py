@@ -88,10 +88,9 @@ class GeometryAnalyzer:
 
                 try:
                     # Import IGES file using Part module directly
-                    Part.read(file_path, doc.Name)
-
-                    # Get the shape from the imported object
-                    shape = doc.Objects[0].Shape
+                    shape = Part.read(file_path)
+                    obj = doc.addObject("Part::Feature", "IGESShape")
+                    obj.Shape = shape
 
                     # Calculate properties
                     volume = shape.Volume
