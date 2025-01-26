@@ -3,7 +3,9 @@ import { useDropzone } from "react-dropzone";
 import { useLanguage } from "../contexts/languageUtils";
 
 // Get API URL from environment variables, fallback to window.location.origin
-const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+const API_URL = (
+  import.meta.env.VITE_API_URL || window.location.origin
+).replace(/\/$/, "");
 
 interface FileUploaderProps {
   onUploadSuccess: (jobId: string) => void;
