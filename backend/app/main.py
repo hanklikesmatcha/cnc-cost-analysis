@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import os
 from pathlib import Path
 from .geometry_analyzer import GeometryAnalyzer
@@ -12,14 +13,25 @@ app = FastAPI()
 geometry_analyzer = GeometryAnalyzer()
 converter = CADConverter()
 
-# Configure CORS
+# Configure CORS based on environment
+ENVIRONMENT = os.getenv("FLASK_ENV", "development")
+CORS_ORIGINS = [
+    "http://localhost:5173",  # Vite dev server
+    "http://localhost:8000",  # Production server
+    os.getenv("FRONTEND_URL", ""),  # Production URL from env
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite dev server
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files only in production
+if ENVIRONMENT == "production":
+    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Create directories if they don't exist
 UPLOAD_DIR = Path("uploads")
@@ -121,3 +133,18 @@ async def check_conversion_status(job_id: str):
     if job_id not in job_statuses:
         return {"status": "not_found", "job_id": job_id}
     return job_statuses[job_id]
+
+
+# Serve frontend static files only in production
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    if ENVIRONMENT != "production":
+        raise HTTPException(status_code=404, detail="Not found in development mode")
+
+    static_path = "static"
+    if not full_path or full_path == "index.html":
+        return FileResponse(f"{static_path}/index.html")
+    elif os.path.exists(f"{static_path}/{full_path}"):
+        return FileResponse(f"{static_path}/{full_path}")
+    else:
+        return FileResponse(f"{static_path}/index.html")
