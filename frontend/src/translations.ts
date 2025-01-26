@@ -14,6 +14,7 @@ export const translations = {
     dropzone: {
       active: "📂 Drop the CAD file here...",
       inactive: "📂 Drag and drop a CAD file here, or click to select a file",
+      formats: "Supported formats:",
     },
     analysis: {
       title: "Part Analysis",
@@ -88,6 +89,7 @@ export const translations = {
     dropzone: {
       active: "📂 將 CAD 檔案拖放至此...",
       inactive: "📂 將 CAD 檔案拖放至此，或點擊選擇檔案",
+      formats: "支援格式：",
     },
     analysis: {
       title: "零件分析",
@@ -161,6 +163,7 @@ export const translations = {
     dropzone: {
       active: "📂 将 CAD 文件拖放至此...",
       inactive: "📂 将 CAD 文件拖放至此，或点击选择文件",
+      formats: "支持格式：",
     },
     analysis: {
       title: "零件分析",

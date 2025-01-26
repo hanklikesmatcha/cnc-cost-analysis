@@ -80,7 +80,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
           {isDragActive ? t.dropzone.active : t.dropzone.inactive}
         </p>
         <p className="text-sm text-gray-500">
-          {t.supportedFormats} <span className="font-medium">.stl</span>,{" "}
+          {t.dropzone.formats} <span className="font-medium">.stl</span>,{" "}
           <span className="font-medium">.step</span>,{" "}
           <span className="font-medium">.stp</span>,{" "}
           <span className="font-medium">.igs</span>,{" "}
