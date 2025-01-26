@@ -52,7 +52,6 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
     accept: {
       "model/stl": [".stl"],
       "model/step": [".step", ".stp"],
-      "model/iges": [".igs", ".iges"],
     },
     noClick: false,
     noKeyboard: false,
@@ -77,11 +76,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
         }`,
       })}
     >
-      <input
-        {...getInputProps()}
-        type="file"
-        accept=".stl,.step,.stp,.igs,.iges"
-      />
+      <input {...getInputProps()} type="file" accept=".stl,.step,.stp" />
       <div className="space-y-4">
         <p className="text-xl font-medium">
           {isDragActive ? t.dropzone.active : t.dropzone.inactive}
@@ -89,9 +84,7 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
         <p className="text-sm text-gray-500">
           {t.dropzone.formats} <span className="font-medium">.stl</span>,{" "}
           <span className="font-medium">.step</span>,{" "}
-          <span className="font-medium">.stp</span>,{" "}
-          <span className="font-medium">.igs</span>,{" "}
-          <span className="font-medium">.iges</span>
+          <span className="font-medium">.stp</span>
         </p>
       </div>
     </div>

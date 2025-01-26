@@ -82,30 +82,6 @@ class GeometryAnalyzer:
                 # Clean up
                 FreeCAD.closeDocument(doc.Name)
 
-            elif file_ext in [".iges", ".igs"]:
-                # Create a new document
-                doc = FreeCAD.newDocument("Analysis")
-
-                try:
-                    # Import IGES file using Part module directly
-                    shape = Part.read(file_path)
-                    obj = doc.addObject("Part::Feature", "IGESShape")
-                    obj.Shape = shape
-
-                    # Calculate properties
-                    volume = shape.Volume
-                    surface_area = shape.Area
-                    center_mass = shape.CenterOfMass
-
-                except Exception as e:
-                    return {
-                        "error": f"Failed to import IGES file: {str(e)}",
-                        "units": "mm",
-                    }
-                finally:
-                    # Clean up
-                    FreeCAD.closeDocument(doc.Name)
-
             else:
                 return {
                     "error": f"Unsupported file format for analysis: {file_ext}",
