@@ -13,7 +13,6 @@ venv/
 # Development
 .git
 .gitignore
-Dockerfile*
 docker-compose*
 README.md
 *.md
@@ -21,12 +20,17 @@ README.md
 .pytest_cache/
 .coverage
 htmlcov/
+tests/
+*.test.*
 
-# Keep these files
+# Temporary directories
+uploads/*
+converted/*
+
+# Keep essential files
 !requirements.txt
 !app/
-!converted/
-!uploads/
+!app/**/*
 
 pip-log.txt
 pip-delete-this-directory.txt

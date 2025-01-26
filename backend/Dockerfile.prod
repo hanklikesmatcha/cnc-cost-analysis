@@ -17,13 +17,15 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Copy requirements first
-COPY ./requirements.txt /app/requirements.txt
+COPY requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY ./app /app/app
-COPY ./converted /app/converted
-COPY ./uploads /app/uploads
+# Copy only the application code
+COPY app /app/app/
+
+# Create and set permissions for required directories
+RUN mkdir -p /app/uploads /app/converted && \
+    chmod 777 /app/uploads /app/converted
 
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
@@ -32,10 +34,6 @@ ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 # Production specific settings
 ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
-
-# Create necessary directories with proper permissions
-RUN mkdir -p /app/uploads /app/converted && \
-    chmod 777 /app/uploads /app/converted
 
 EXPOSE 8000
 
