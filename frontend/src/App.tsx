@@ -32,7 +32,6 @@ function MainContent() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [geometry, setGeometry] = useState<GeometryData | null>(null);
   const [convertedGeometry, setConvertedGeometry] =
     useState<GeometryData | null>(null);
 
@@ -46,7 +45,6 @@ function MainContent() {
 
         setStatus(data.status);
         if (data.error) setError(data.error);
-        if (data.geometry) setGeometry(data.geometry);
         if (data.converted_geometry)
           setConvertedGeometry(data.converted_geometry);
       } catch (e) {
@@ -62,7 +60,6 @@ function MainContent() {
     setJobId(null);
     setStatus("idle");
     setError(null);
-    setGeometry(null);
     setConvertedGeometry(null);
   };
 
@@ -133,13 +130,6 @@ function MainContent() {
                     <UploadStatus status={status} onReset={handleReset} />
                   )}
                 </div>
-              </div>
-            )}
-
-            {geometry && (
-              <div className="w-full border-t pt-4 flex flex-col items-center">
-                <h3 className="text-lg mb-2">{t.analysis.originalGeometry}</h3>
-                <GeometryAnalysis data={geometry} />
               </div>
             )}
 

@@ -500,50 +500,15 @@
   margin-bottom: 1rem;
 }
 
-.cost-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-.cost-item {
-  background: white;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.cost-label {
-  font-weight: 500;
-  color: #0c4a6e;
-}
-
-.cost-value {
-  color: #0369a1;
-  font-weight: 600;
-}
-
-@media (min-width: 640px) {
-  .analysis-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .analysis-item.full-width {
-    grid-column: span 2;
-  }
-}
-
-.cost-section {
-  margin-bottom: 2rem;
-}
-
 .cost-subtitle {
   font-size: 1.125rem;
   font-weight: 500;
   color: #0c4a6e;
   margin-bottom: 1rem;
+}
+
+.cost-section {
+  margin-bottom: 2rem;
 }
 
 .cost-table {
@@ -582,6 +547,25 @@
   background: white;
   border-radius: 0.5rem;
   padding: 1rem;
+}
+
+.cost-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cost-label {
+  font-weight: 500;
+  color: #0c4a6e;
+}
+
+.cost-value {
+  color: #0369a1;
+  font-weight: 600;
 }
 
 .cost-disclaimer {
