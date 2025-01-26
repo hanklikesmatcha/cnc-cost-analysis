@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import { translations } from "../translations";
 
-export type Language = "en" | "zh-TW" | "zh-CN";
+export type Language = "en" | "zh-TW" | "zh-CN" | "ja";
 export type TranslationType = typeof translations.en;
 
 export interface LanguageContextType {

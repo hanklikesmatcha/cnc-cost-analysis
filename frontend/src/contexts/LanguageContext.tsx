@@ -13,6 +13,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (lang.startsWith("zh")) {
       return lang.includes("tw") ? "zh-TW" : "zh-CN";
     }
+    if (lang.startsWith("ja")) {
+      return "ja";
+    }
     return "en";
   };
 
