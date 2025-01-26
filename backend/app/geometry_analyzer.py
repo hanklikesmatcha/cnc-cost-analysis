@@ -64,11 +64,11 @@ class GeometryAnalyzer:
                 surface_area = np.sum(mesh_data.areas)  # Total surface area
                 center_mass = mesh_data.get_mass_properties()[1]  # Center of mass
 
-            elif file_ext in [".step", ".stp"]:
+            elif file_ext in [".step", ".stp", ".iges", ".igs"]:
                 # Create a new document
                 doc = FreeCAD.newDocument("Analysis")
 
-                # Import the STEP file
+                # Import the file
                 Part.insert(file_path, doc.Name)
 
                 # Get the shape from the imported object
