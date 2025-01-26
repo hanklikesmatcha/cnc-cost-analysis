@@ -23,23 +23,25 @@ htmlcov/
 tests/
 *.test.*
 
-# Temporary directories
-uploads/*
-converted/*
-
-# Keep essential files
-!requirements.txt
-!app/
-!app/**/*
-
-pip-log.txt
-pip-delete-this-directory.txt
-.tox
+# Temporary files and directories
+*.log
+.DS_Store
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
-*.log
-.env.local
-.DS_Store 
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+
+# Temporary directories but keep the folders
+uploads/*
+!uploads/.gitkeep
+converted/*
+!converted/.gitkeep
+
+# Keep essential files
+!requirements.txt
+!app/
+!app/**/* 
