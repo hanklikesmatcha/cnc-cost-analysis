@@ -1,32 +1,41 @@
-# Use Ubuntu as base image for better FreeCAD support
 FROM ubuntu:22.04
 
-# Prevent interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Python, FreeCAD and other dependencies
-RUN apt-get update && apt-get install -y \
+# Install Python, FreeCAD and other dependencies with optimized layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     freecad \
     python3-pyside2.qtcore \
     python3-pyside2.qtgui \
     python3-numpy \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
+# Copy requirements first
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy only the application code
+COPY app app/
+
+# Create and set permissions for required directories
+RUN mkdir -p uploads converted && \
+    chmod 777 uploads converted
 
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
 ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 
-# Command to run the application
-CMD ["python3", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+# Production specific settings
+ENV FLASK_ENV=production
+ENV FLASK_DEBUG=0
+
+EXPOSE 8000
+
+# Use a shell form to allow environment variable expansion
+CMD python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
