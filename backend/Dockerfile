@@ -26,6 +26,9 @@ RUN apt-get update && \
 
 WORKDIR /app
 
+# Install Python dependencies
+RUN pip3 install uvicorn fastapi
+
 # Copy backend files
 COPY . .
 
