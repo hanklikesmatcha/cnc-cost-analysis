@@ -7,6 +7,9 @@ import { useLanguage } from "./contexts/languageUtils";
 import { LanguageSwitch } from "./components/LanguageSwitch";
 import "./App.css";
 
+// Get API URL from environment variables, fallback to window.location.origin
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+
 interface GeometryData {
   volume?: number;
   surface_area?: number;
@@ -37,9 +40,7 @@ function MainContent() {
 
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(
-          `http://localhost:8000/api/conversion/${jobId}`
-        );
+        const response = await fetch(`${API_URL}/api/conversion/${jobId}`);
         const data: ConversionData = await response.json();
 
         setStatus(data.status);
