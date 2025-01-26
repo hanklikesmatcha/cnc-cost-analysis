@@ -13,12 +13,6 @@
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10,
-    "env": {
-      "PYTHONPATH": "/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app",
-      "LD_LIBRARY_PATH": "/usr/lib/freecad/lib",
-      "FLASK_ENV": "production",
-      "FLASK_DEBUG": "0"
-    }
+    "restartPolicyMaxRetries": 10
   }
 } 
