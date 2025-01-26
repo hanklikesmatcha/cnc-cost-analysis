@@ -29,6 +29,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "CNC API is running"}
+
+
+@app.get("/health")
+@app.get("/api/health")
+async def health_check():
+    return {"status": "healthy", "service": "backend"}
+
+
 # Mount static files only in production
 if ENVIRONMENT == "production":
     app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -41,11 +53,6 @@ CONVERTED_DIR.mkdir(exist_ok=True)
 
 # Store job statuses in memory (in production, use a database)
 job_statuses: Dict[str, Dict[str, Any]] = {}
-
-
-@app.get("/api/health")
-async def health_check():
-    return {"status": "healthy", "service": "backend"}
 
 
 async def process_conversion(
