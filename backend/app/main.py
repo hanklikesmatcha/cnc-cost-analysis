@@ -55,6 +55,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files in production
+if ENVIRONMENT == "production":
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -116,10 +120,6 @@ async def health_check():
             },
         )
 
-
-# Mount static files only in production
-if ENVIRONMENT == "production":
-    app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Create directories if they don't exist
 UPLOAD_DIR = Path("uploads")
@@ -218,13 +218,15 @@ async def check_conversion_status(job_id: str):
     return job_statuses[job_id]
 
 
-# Serve frontend static files only in production
+# Serve frontend at root path in production
 @app.get("/{full_path:path}")
 async def serve_frontend(full_path: str):
     if ENVIRONMENT != "production":
         raise HTTPException(status_code=404, detail="Not found in development mode")
 
+    logger.debug(f"Serving path: {full_path}")
     static_path = "static"
+
     if not full_path or full_path == "index.html":
         return FileResponse(f"{static_path}/index.html")
     elif os.path.exists(f"{static_path}/{full_path}"):
