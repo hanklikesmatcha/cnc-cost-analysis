@@ -4,28 +4,40 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: cad-backend
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - backend_uploads:/app/uploads
+      - backend_converted:/app/converted
     environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
       - PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
       - LD_LIBRARY_PATH=/usr/lib/freecad/lib
     networks:
       - cad-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: cad-frontend
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
     networks:
       - cad-network
+
+volumes:
+  backend_uploads:
+  backend_converted:
 
 networks:
   cad-network:
