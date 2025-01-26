@@ -56,6 +56,15 @@ function MainContent() {
     return () => clearInterval(interval);
   }, [jobId, status]);
 
+  // Function to reset all states
+  const handleReset = () => {
+    setJobId(null);
+    setStatus("idle");
+    setError(null);
+    setGeometry(null);
+    setConvertedGeometry(null);
+  };
+
   return (
     <div className="main-content">
       {/* Language Switch - Fixed position */}
@@ -110,7 +119,23 @@ function MainContent() {
             <p className="text-center text-sm mb-4">{t.uploadDescription}</p>
 
             <div className="w-full flex justify-center mb-4">
-              <FileUploader onUploadSuccess={setJobId} />
+              {status === "completed" || status === "failed" ? (
+                <div className="flex flex-col items-center gap-4">
+                  <button
+                    onClick={handleReset}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    Upload Another File
+                  </button>
+                  {status === "completed" && (
+                    <div className="text-green-600">
+                      Analysis completed successfully!
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <FileUploader onUploadSuccess={setJobId} />
+              )}
             </div>
 
             {jobId && (

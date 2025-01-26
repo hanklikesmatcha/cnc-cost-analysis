@@ -34,11 +34,6 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
 
         const data = await response.json();
         onUploadSuccess(data.job_id);
-
-        // Reset the dropzone
-        (
-          document.querySelector('input[type="file"]') as HTMLInputElement
-        ).value = "";
       } catch (error) {
         console.error("Upload error:", error);
         alert("Failed to upload file. Please try again.");
