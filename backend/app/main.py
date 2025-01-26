@@ -55,40 +55,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files in production
-if ENVIRONMENT == "production":
-    app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
-
-@app.on_event("startup")
-async def startup_event():
-    try:
-        logger.info("Starting application initialization")
-
-        # Create required directories
-        for dir_name in ["uploads", "converted", "static"]:
-            path = Path(dir_name)
-            path.mkdir(exist_ok=True)
-            logger.info(
-                f"Directory {dir_name} exists: {path.exists()}, is writable: {os.access(path, os.W_OK)}"
-            )
-
-        # Check Python path
-        logger.info(f"PYTHONPATH: {os.getenv('PYTHONPATH')}")
-        logger.info(f"sys.path: {sys.path}")
-
-        logger.info("Application initialization completed successfully")
-    except Exception as e:
-        logger.error(f"Startup failed: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise
-
-
-@app.get("/")
-async def root():
-    logger.debug("Root endpoint called")
-    return {"status": "ok", "message": "CNC API is running"}
-
 
 @app.get("/health")
 async def health_check():
@@ -222,18 +188,6 @@ async def check_conversion_status(job_id: str):
     return job_statuses[job_id]
 
 
-# Serve frontend at root path in production
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    if ENVIRONMENT != "production":
-        raise HTTPException(status_code=404, detail="Not found in development mode")
-
-    logger.debug(f"Serving path: {full_path}")
-    static_path = "static"
-
-    if not full_path or full_path == "index.html":
-        return FileResponse(f"{static_path}/index.html")
-    elif os.path.exists(f"{static_path}/{full_path}"):
-        return FileResponse(f"{static_path}/{full_path}")
-    else:
-        return FileResponse(f"{static_path}/index.html")
+# Mount static files at the end in production
+if ENVIRONMENT == "production":
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
