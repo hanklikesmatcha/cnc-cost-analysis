@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     companyInfo: {
-      name: "Bing Li CNC Manufacturing",
+      name: "Precision CNC Solutions",
       email: "szuhan.eng@gmail.com",
       phone: "+886-2-6940310",
       address:
@@ -91,7 +91,7 @@ export const translations = {
   },
   "zh-TW": {
     companyInfo: {
-      name: "竝利精密機械",
+      name: "精密 CNC 解決方案",
       email: "szuhan.eng@gmail.com",
       phone: "+886-2-6940310",
       address: "臺灣新北市汐止區福德一路342巷一弄6號",
@@ -177,7 +177,7 @@ export const translations = {
   },
   "zh-CN": {
     companyInfo: {
-      name: "竝利精密机械",
+      name: "精密 CNC 解决方案",
       email: "szuhan.eng@gmail.com",
       phone: "+886-2-6940310",
       address: "台湾新北市汐止区福德一路342巷一弄6号",
