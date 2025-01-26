@@ -26,8 +26,9 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Install Python dependencies
-RUN pip3 install uvicorn fastapi
+# Copy and install Python dependencies first
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt uvicorn
 
 # Copy backend files
 COPY . .
@@ -45,5 +46,5 @@ ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
 
 EXPOSE 8000
 
-# Default command (can be overridden by Railway)
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WORKERS:-4} 
+# Default command with single worker and debug logging
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --log-level debug 
