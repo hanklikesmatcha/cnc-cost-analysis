@@ -5,10 +5,15 @@ WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend .
-# Copy environment files for production build
-COPY frontend/.env.production frontend/.env
-# Increase Node.js memory limit for build
-RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build || NODE_OPTIONS="--max-old-space-size=4096" npm run build:force
+# Set Node options to increase memory limit
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Create .env file with required variables for production build
+RUN echo "VITE_API_URL=https://cnc-cost-analysis-production.up.railway.app" > .env && \
+    echo "VITE_PUBLIC_POSTHOG_KEY=phc_iZWHQ6CzRbemZjXpJ6OT28rqIqq54fy8twQ4PqoAwvE" >> .env && \
+    echo "VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com" >> .env
+# Log environment and run build with verbose output
+RUN node -e "console.log('Node memory limit:', process.memoryUsage())" && \
+    npm run build || npm run build -- --no-type-check
 
 FROM ubuntu:22.04
 
@@ -16,27 +21,31 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
 
-# Install Python, FreeCAD and other dependencies with optimized layer
-# Split into smaller installations to reduce memory usage
+# Split package installation into smaller steps to reduce memory usage
+# Install basic Python and utilities first
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 python3-pip bash && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    bash \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install FreeCAD and dependencies separately to avoid memory issues
+# Install FreeCAD separately (memory intensive)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends freecad && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    freecad \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies separately
+# Install remaining Python packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python3-pyside2.qtcore \
     python3-pyside2.qtgui \
-    python3-numpy && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    python3-numpy \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
