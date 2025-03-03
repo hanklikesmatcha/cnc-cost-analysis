@@ -7,12 +7,11 @@ COPY frontend/package*.json ./
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm install
 COPY frontend .
-# Create .env file with required variables for production build
-RUN echo "VITE_API_URL=https://cnc-cost-analysis-production.up.railway.app" > .env && \
-    echo "VITE_PUBLIC_POSTHOG_KEY=phc_iZWHQ6CzRbemZjXpJ6OT28rqIqq54fy8twQ4PqoAwvE" >> .env && \
-    echo "VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com" >> .env
-# Try different build approaches in sequence if earlier ones fail
-RUN npm run build || npm run build:force || npm run build:skipcheck
+
+# Build with explicit error handling
+RUN npm run build && echo "Build completed successfully" || \
+    (echo "Standard build failed, trying force build..." && npm run build:force) || \
+    (echo "Force build failed, trying skipcheck build..." && npm run build:skipcheck)
 
 FROM ubuntu:22.04 AS base
 
@@ -20,44 +19,23 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
 
-# Split package installation into smaller steps with aggressive cleanup
-# Install only essential Python first
+# Install all required packages in a single layer to reduce image size
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 python3-pip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Install bash separately
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends bash && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Install FreeCAD with minimal dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends --no-install-suggests freecad && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Install remaining Python packages one by one
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-pyside2.qtcore && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-pyside2.qtgui && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-numpy && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-dev \
+    bash \
+    freecad \
+    python3-pyside2.qtcore \
+    python3-pyside2.qtgui \
+    python3-numpy && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /app
 
-# Copy requirements first
+# Copy requirements first for better layer caching
 COPY backend/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
@@ -66,7 +44,7 @@ COPY backend/app app/
 
 # Create and set permissions for required directories
 RUN mkdir -p uploads converted static/assets && \
-    chmod -R 777 uploads converted static
+    chmod -R 755 uploads converted static
 
 # Copy frontend build from the builder stage
 COPY --from=frontend-builder /frontend/dist/ /app/static/
@@ -74,6 +52,10 @@ COPY --from=frontend-builder /frontend/dist/ /app/static/
 # Set Python path to include FreeCAD libraries
 ENV PYTHONPATH=/usr/lib/freecad/lib:/usr/lib/python3/dist-packages:/app
 ENV LD_LIBRARY_PATH=/usr/lib/freecad/lib:${LD_LIBRARY_PATH}
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/ || exit 1
 
 EXPOSE 8000
 
