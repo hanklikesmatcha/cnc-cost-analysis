@@ -5,7 +5,10 @@ WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend .
-RUN npm run build
+# Copy environment files for production build
+COPY frontend/.env.production frontend/.env
+# Increase Node.js memory limit for build
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build || NODE_OPTIONS="--max-old-space-size=4096" npm run build:force
 
 FROM ubuntu:22.04
 
@@ -14,17 +17,26 @@ ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
 
 # Install Python, FreeCAD and other dependencies with optimized layer
+# Split into smaller installations to reduce memory usage
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-pip bash && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install FreeCAD and dependencies separately to avoid memory issues
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends freecad && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies separately
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    freecad \
     python3-pyside2.qtcore \
     python3-pyside2.qtgui \
-    python3-numpy \
-    bash \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    python3-numpy && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
