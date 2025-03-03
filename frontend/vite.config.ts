@@ -5,7 +5,8 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   define: {
-    "process.env": process.env,
+    // Use empty object as fallback to avoid TypeScript errors
+    "process.env": JSON.stringify({}),
   },
   base: "/",
   build: {
