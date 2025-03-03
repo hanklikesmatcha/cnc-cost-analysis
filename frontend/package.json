@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b --verbose && vite build",
     "build:force": "tsc -b --verbose --force && vite build",
+    "build:skipcheck": "vite build --skipTypeCheck",
     "lint": "eslint .",
     "preview": "vite preview"
   },

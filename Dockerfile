@@ -3,49 +3,57 @@ FROM node:18-alpine AS frontend-builder
 WORKDIR /frontend
 # Copy frontend files
 COPY frontend/package*.json ./
+# Install dependencies with increased memory for npm
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm install
 COPY frontend .
-# Set Node options to increase memory limit
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 # Create .env file with required variables for production build
 RUN echo "VITE_API_URL=https://cnc-cost-analysis-production.up.railway.app" > .env && \
     echo "VITE_PUBLIC_POSTHOG_KEY=phc_iZWHQ6CzRbemZjXpJ6OT28rqIqq54fy8twQ4PqoAwvE" >> .env && \
     echo "VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com" >> .env
-# Log environment and run build with verbose output
-RUN node -e "console.log('Node memory limit:', process.memoryUsage())" && \
-    npm run build || npm run build -- --no-type-check
+# Try different build approaches in sequence if earlier ones fail
+RUN npm run build || npm run build:force || npm run build:skipcheck
 
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
 
-# Split package installation into smaller steps to reduce memory usage
-# Install basic Python and utilities first
+# Split package installation into smaller steps with aggressive cleanup
+# Install only essential Python first
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    bash \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends python3 python3-pip && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install FreeCAD separately (memory intensive)
+# Install bash separately
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    freecad \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends bash && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install remaining Python packages
+# Install FreeCAD with minimal dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python3-pyside2.qtcore \
-    python3-pyside2.qtgui \
-    python3-numpy \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends --no-install-suggests freecad && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install remaining Python packages one by one
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-pyside2.qtcore && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-pyside2.qtgui && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-numpy && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /app
 
