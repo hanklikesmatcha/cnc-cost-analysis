@@ -7,8 +7,6 @@ import { useLanguage } from "./contexts/languageUtils";
 import { LanguageSwitch } from "./components/LanguageSwitch";
 import { UploadStatus } from "./components/UploadStatus";
 import "./App.css";
-import { usePostHog } from "posthog-js/react";
-import { config } from "./config";
 
 // Get API URL from environment variables, fallback to window.location.origin
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
