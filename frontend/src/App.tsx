@@ -6,6 +6,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/languageUtils";
 import { LanguageSwitch } from "./components/LanguageSwitch";
 import { UploadStatus } from "./components/UploadStatus";
+import { SEOHelmet } from "./components/SEOHelmet";
 import "./App.css";
 
 // Get API URL from environment variables, fallback to window.location.origin
@@ -65,6 +66,8 @@ function MainContent() {
 
   return (
     <div className="main-content">
+      <SEOHelmet />
+
       {/* Language Switch - Fixed position */}
       <div className="fixed">
         <LanguageSwitch />

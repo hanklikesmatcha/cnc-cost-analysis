@@ -1,6 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { useLanguage } from "../contexts/languageUtils";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Get API URL from environment variables, fallback to window.location.origin
 const API_URL = (
@@ -13,11 +15,15 @@ interface FileUploaderProps {
 
 export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
   const { t } = useLanguage();
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (acceptedFiles.length === 0) return;
 
+      setIsUploading(true);
+      setUploadError(null);
       const file = acceptedFiles[0];
       const formData = new FormData();
       formData.append("file", file);
@@ -36,13 +42,21 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
         onUploadSuccess(data.job_id);
       } catch (error) {
         console.error("Upload error:", error);
-        alert("Failed to upload file. Please try again.");
+        setUploadError("Failed to upload file. Please try again.");
+      } finally {
+        setIsUploading(false);
       }
     },
     [onUploadSuccess]
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragReject,
+    acceptedFiles,
+  } = useDropzone({
     onDrop,
     accept: {
       "model/stl": [".stl"],
@@ -50,37 +64,133 @@ export function FileUploader({ onUploadSuccess }: FileUploaderProps) {
     },
     noClick: false,
     noKeyboard: false,
-    disabled: false,
+    disabled: isUploading,
     multiple: false,
-    onDragEnter: (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-    },
-    onDragOver: (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-    },
-    onDragLeave: (e: React.DragEvent<HTMLElement>) => {
-      e.preventDefault();
-    },
   });
+
+  // Determine UI states
+  const isFileSelected = acceptedFiles.length > 0;
+  const fileName = isFileSelected ? acceptedFiles[0].name : null;
 
   return (
     <div
       {...getRootProps({
-        className: `relative overflow-hidden transition-all duration-300 rounded-xl p-12 min-h-[240px] flex flex-col justify-center text-center cursor-pointer bg-gray-50 ${
-          isDragActive ? "bg-blue-50" : "hover:bg-gray-100"
+        className: `card border-2 border-dashed p-4 text-center ${
+          isDragActive
+            ? "border-primary bg-light"
+            : isDragReject
+            ? "border-danger bg-danger-subtle"
+            : isUploading
+            ? "border-secondary"
+            : isFileSelected
+            ? "border-success bg-success-subtle"
+            : "border-primary-subtle"
         }`,
+        role: "button",
+        "aria-label":
+          "Upload file area. Drag and drop or click to select a file.",
+        tabIndex: 0,
       })}
     >
-      <input {...getInputProps()} type="file" accept=".stl,.step,.stp" />
-      <div className="space-y-4">
-        <p className="text-xl font-medium">
-          {isDragActive ? t.dropzone.active : t.dropzone.inactive}
-        </p>
-        <p className="text-sm text-gray-500">
-          {t.dropzone.formats} <span className="font-medium">.stl</span>,{" "}
-          <span className="font-medium">.step</span>,{" "}
-          <span className="font-medium">.stp</span>
-        </p>
+      <input
+        {...getInputProps()}
+        type="file"
+        accept=".stl,.step,.stp"
+        aria-label="File upload input"
+        disabled={isUploading}
+      />
+
+      <div className="py-4">
+        {/* File icon */}
+        <div className="mb-3 display-5 text-center">
+          {isUploading ? (
+            <i className="bi bi-arrow-repeat text-primary"></i>
+          ) : isDragActive ? (
+            <i className="bi bi-cloud-download text-primary"></i>
+          ) : isDragReject ? (
+            <i className="bi bi-exclamation-circle text-danger"></i>
+          ) : isFileSelected ? (
+            <i className="bi bi-check-circle text-success"></i>
+          ) : (
+            <i className="bi bi-upload text-primary"></i>
+          )}
+        </div>
+
+        {/* Main prompt text */}
+        <h5
+          className={`fw-semibold mb-2 ${
+            isDragReject
+              ? "text-danger"
+              : isDragActive
+              ? "text-primary"
+              : isFileSelected
+              ? "text-success"
+              : ""
+          }`}
+        >
+          {isUploading ? (
+            "Uploading..."
+          ) : isDragActive ? (
+            t.dropzone.active
+          ) : isDragReject ? (
+            "File type not supported"
+          ) : isFileSelected ? (
+            <>
+              File selected: <span className="fw-normal fs-6">{fileName}</span>
+            </>
+          ) : (
+            t.dropzone.inactive
+          )}
+        </h5>
+
+        {/* Format info */}
+        {!isUploading && !isFileSelected && (
+          <p className="text-secondary small mb-3">
+            {t.dropzone.formats} <span className="fw-medium">.stl</span>,{" "}
+            <span className="fw-medium">.step</span>,{" "}
+            <span className="fw-medium">.stp</span>
+          </p>
+        )}
+
+        {/* Error message */}
+        {uploadError && (
+          <div className="alert alert-danger py-2 mt-3 mb-0" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {uploadError}
+          </div>
+        )}
+
+        {/* Upload button */}
+        {!isUploading && !isFileSelected && (
+          <button
+            type="button"
+            className="btn btn-primary mt-3"
+            onClick={(e) => {
+              e.stopPropagation();
+              const fileInput = document.querySelector('input[type="file"]');
+              if (fileInput) {
+                (fileInput as HTMLInputElement).click();
+              }
+            }}
+          >
+            <i className="bi bi-upload me-2"></i>
+            Browse Files
+          </button>
+        )}
+
+        {/* Progress indicator */}
+        {isUploading && (
+          <div className="progress mt-3" style={{ height: "6px" }}>
+            <div
+              className="progress-bar progress-bar-striped progress-bar-animated"
+              role="progressbar"
+              aria-valuenow={75}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              style={{ width: "75%" }}
+            ></div>
+          </div>
+        )}
       </div>
     </div>
   );

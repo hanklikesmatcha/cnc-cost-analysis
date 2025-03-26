@@ -576,3 +576,39 @@
   border-radius: 0.5rem;
   margin-top: 1rem;
 }
+
+/* File Uploader Animation */
+@keyframes pulse-width {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 95%;
+  }
+}
+
+.animate-pulse-width {
+  animation: pulse-width 2s ease-in-out infinite;
+}
+
+/* Responsive file uploader improvements */
+@media (max-width: 640px) {
+  .file-uploader-label {
+    font-size: 0.875rem;
+  }
+}
+
+/* Focus outline for accessibility */
+[role="button"]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* File upload visual enhancements */
+.file-selected {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
